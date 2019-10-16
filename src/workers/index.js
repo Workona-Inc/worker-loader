@@ -16,12 +16,12 @@ const getWorker = (file, content, options) => {
     const fallbackWorkerPath =
       options.fallback === false ? 'null' : publicWorkerPath;
 
-    return `require(${InlineWorkerPath})(${JSON.stringify(
+    return `function() {\n return require(${InlineWorkerPath})(${JSON.stringify(
       content
-    )}, ${fallbackWorkerPath})`;
+    )}, ${fallbackWorkerPath});\n}`;
   }
 
-  return `new Worker(${publicWorkerPath})`;
+  return `function(shared) {\n return shared ? new SharedWorker(${publicWorkerPath}) : new Worker(${publicWorkerPath});\n}`;
 };
 
 export default getWorker;

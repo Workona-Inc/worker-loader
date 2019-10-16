@@ -187,9 +187,7 @@ test('should use the publicPath option as the base URL if specified', () =>
     const bundle = assets['bundle.js'];
     const worker = Object.keys(assets)[1];
 
-    expect(bundle.source()).toContain(
-      `new Worker("/some/proxy/" + "${worker}")`
-    );
+    expect(bundle.source()).toContain(`new Worker("/some/proxy/${worker}")`);
   }));
 
 ['web', 'webworker'].forEach((target) => {

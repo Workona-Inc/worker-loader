@@ -31,7 +31,7 @@ $ npm install worker-loader --save-dev
 
 ```js
 // App.js
-import Worker from 'worker-loader!./Worker.js';
+import workerFactory from 'worker-loader!./Worker.js';
 ```
 
 ### Config
@@ -52,9 +52,9 @@ import Worker from 'worker-loader!./Worker.js';
 
 ```js
 // App.js
-import Worker from './file.worker.js';
+import workerFactory from './file.worker.js';
 
-const worker = new Worker();
+const worker = workerFactory();
 
 worker.postMessage({ a: 1 });
 worker.onmessage = function (event) {};
@@ -180,6 +180,20 @@ self.postMessage({ foo: 'foo' })
 self.addEventListener('message', (event) => console.log(event))
 ```
 
+### Shared Workers
+
+```js
+// App.js
+import workerFactory from './file.worker.js';
+
+const sharedWorker = workerFactory(true);
+
+sharedWorker.port.postMessage({ a: 1 });
+sharedWorker.port.onmessage = function (event) {};
+
+sharedWorker.port.addEventListener("message", function (event) {});
+```
+
 ### Integrating with TypeScript
 
 To integrate with TypeScript, you will need to define a custom module for the exports of your worker
@@ -187,11 +201,8 @@ To integrate with TypeScript, you will need to define a custom module for the ex
 ```typescript
 // typings/custom.d.ts
 declare module "worker-loader!*" {
-  class WebpackWorker extends Worker {
-    constructor();
-  }
-
-  export default WebpackWorker;
+  const workerFactory: (shared?: boolean) => Worker | SharedWorker.SharedWorker;
+  export default workerFactory;
 }
 ```
 
@@ -208,9 +219,9 @@ ctx.addEventListener("message", (event) => console.log(event));
 
 ```typescript
 // App.ts
-import Worker from "worker-loader!./Worker";
+import workerFactory from "worker-loader!./Worker";
 
-const worker = new Worker();
+const worker = workerFactory();
 
 worker.postMessage({ a: 1 });
 worker.onmessage = (event) => {};
@@ -233,7 +244,7 @@ external script via the [`inline`](#inline) parameter
 
 ```js
 // App.js
-import Worker from './file.worker.js';
+import workerFactory from './file.worker.js';
 ```
 
 ```js
@@ -250,7 +261,7 @@ Secondly, you may override the base download URL for your worker script via the
 ```js
 // App.js
 // This will cause the worker to be downloaded from `/workers/file.worker.js`
-import Worker from './file.worker.js';
+import workerFactory from './file.worker.js';
 ```
 
 ```js
